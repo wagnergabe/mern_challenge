@@ -33,11 +33,24 @@ const resolvers = {
     addUser: async (parent, args) => {
         const user = await User.create(args);
         const token = signToken(user);
-        
+
         return { token, user };
       },
     //saveBook: accepts a book auther's array, description, title, bookID, image, and link as parameters; 
         //returns a user type
+        saveBook: async (parent, args, context) => {
+            if (context.user) {
+              const Userupdate = await User.findByIdAndUpdate(
+                { _id: context.user._id },
+                { $push: { savedBooks: args.input} },
+                { new: true }
+              );
+      
+              return Userupdate;
+            }
+      
+            throw new AuthenticationError('Please sign in');
+          },
     //removeBook: accepts a book's bookID as a parameters; returns a User Type
     //User type:
         //_id
