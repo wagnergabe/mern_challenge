@@ -15,9 +15,27 @@ const resolvers = {
         throw new AuthenticationError("Need to be logged in!")
       }
     },
-    mutation: 
+    mutation: {
     //login: accepts an email and password as parameters, returns an auth type
+    login: async (parent, { email, password }) => {
+        const user = await User.findOne({ email });
+        if (!user) {
+          throw new AuthenticationError("No User found, please try again")
+        }
+        const correctPw = await user.isCorrectPassword(password);
+        if (!correctPw) {
+          throw new AuthenticationError("incorrect password, please try again")
+        } 
+        const token = signToken(user);
+        return { token, user };
+      },
     //addUser: accepts a username, email, and password as parameters, returns an Auth type;
+    addUser: async (parent, args) => {
+        const user = await User.create(args);
+        const token = signToken(user);
+        
+        return { token, user };
+      },
     //saveBook: accepts a book auther's array, description, title, bookID, image, and link as parameters; 
         //returns a user type
     //removeBook: accepts a book's bookID as a parameters; returns a User Type
@@ -38,4 +56,5 @@ const resolvers = {
     //Auth type:
         //token
         //user(Reerences the user type)
+}
 }
