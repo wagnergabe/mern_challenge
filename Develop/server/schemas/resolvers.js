@@ -43,7 +43,7 @@ const resolvers = {
               const Userupdate = await User.findByIdAndUpdate(
                 { _id: context.user._id },
                 { $push: { savedBooks: args.input} },
-                { new: true }
+                { new: true, runValidators: true }
               );
       
               return Userupdate;
@@ -52,22 +52,18 @@ const resolvers = {
             throw new AuthenticationError('Please sign in');
           },
     //removeBook: accepts a book's bookID as a parameters; returns a User Type
-    //User type:
-        //_id
-        //-username
-        //email
-        //bookCount
-        //savedBooks(This will be an array of the Book type.)
-    //Book type:
-        //bookId(Not the _id, but the book's id value returned rom groogle's book api)
-        //authors(An array of srings, as there may be more than one aurther)
-        //description
-        //title
-        //image
-        //link
+    removeBook: async (parent, args, context) => {
+        if (context.user) {
+          const userUpdate = await User.findOneAndUpdate(
+            { _id: context.user._id },
+            { $push: { savedBooks: args.body } },
+            { new: true, runValidators }
+          );
+          return userUpdate;
+        }
+        throw new AuthenticationError("NO user with this ID")
+      }
+    }
+}
 
-    //Auth type:
-        //token
-        //user(Reerences the user type)
-}
-}
+module.exports = resolvers
