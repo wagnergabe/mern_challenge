@@ -1,23 +1,40 @@
-    //User type:
-        //_id
-        //-username
-        //email
-        //bookCount
-        //savedBooks(This will be an array of the Book type.)
-    //Book type:
-        //bookId(Not the _id, but the book's id value returned rom groogle's book api)
-        //authors(An array of srings, as there may be more than one aurther)
-        //description
-        //title
-        //image
-        //link
-
-    //Auth type:
-        //token
-        //user(Reerences the user type)
+const { gql } = require('apollo-server-express');    
     
-    //type mutation
-    //login
-    //addUser
-    //saveBook
-    //removeBook
+const typeDefs = gql `
+    type User {
+        _id: ID
+        username: String
+        email: String
+        bookCound: Int
+        savedBooks: [Book]
+    }
+
+    type Book {
+        bookId: String
+        authors: [String]
+        description: String
+        title: String
+        image: String
+        link: String
+    }
+
+    type Auth {
+        token: ID
+        user: User
+    }
+
+    type Query {
+        me: User
+        users: [User]
+        user(username: String!): User
+    }
+
+    type Mutation {
+        login(email: String!, password: String!): Auth
+        addUser(username: String!, email: String!, password: String!): Auth
+        saveBook(bookInfo: bookInfo!): User
+        removeBook(bookId: String!): User
+    }   
+`;
+
+module.exports = typeDefs;
